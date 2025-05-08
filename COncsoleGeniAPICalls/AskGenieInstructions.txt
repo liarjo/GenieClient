@@ -1,0 +1,23 @@
+    Fetches the database information for the specified information related to:
+        a. Information about racing circuits.
+        b. Status codes and their descriptions.
+        c. Results of sprint races.
+        d. Information about racing seasons.
+        e. Information about  Details of races.
+        f.  Results of races.
+        g. Qualifying results.
+        h. Details of pit stops.
+        i. Lap times for each driver.
+        j.  Information about drivers.
+        k.  Standings of drivers.
+        L.  Information about constructors (teams).
+        m. Standings of constructors.
+        n.  Results of constructors in races.
+        o. any other data related to formula 1.
+        p.  Information about the database schema.
+        q.  Information about the database tables.
+    
+
+    :param prompt  (str): the question to answwer with grounded data 
+    :return: text response to the question. 
+    :rtype: str that coinstain   query,   result and  description

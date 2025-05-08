@@ -1,8 +1,92 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿#nullable disable
+
+using Microsoft.Extensions.Configuration;
 
 class Program
 {
     static async Task Main(string[] args)
+    {
+        while (true)
+        {
+            Console.WriteLine("=== Main Menu ===");
+            Console.WriteLine("1. Call Genie API");
+            Console.WriteLine("2. Call Azure AI Agent");
+            Console.WriteLine("3. Exit");
+            Console.Write("Please select an option (1-3): ");
+
+            string? choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    await CallGenieAPI();
+                    break;
+                case "2":
+                    await CallAzureAIAgent();
+                    break;
+                case "3":
+                    Console.WriteLine("Exiting the application. Goodbye!");
+                    return;
+                default:
+                    Console.WriteLine("Invalid choice. Please try again.");
+                    break;
+            }
+
+            Console.WriteLine(); // Add a blank line for better readability
+        }
+    }
+    static async Task CallAzureAIAgent()
+    {
+         // Load configuration from appsettings.json
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(AppContext.BaseDirectory)
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+            .Build();
+        string PROJECT_CONNECTION_STRING = configuration["PROJECT_CONNECTION_STRING"] 
+            ?? throw new ArgumentNullException("PROJECT_CONNECTION_STRING", "ConnectionString cannot be null in the configuration.");
+        
+        
+
+        azureAIAgent myAgent = new(PROJECT_CONNECTION_STRING);
+
+        // Subscribe to the OnStreamUpdate event
+        myAgent.OnStreamUpdate += (update) =>
+        {
+            Console.Write($"{update}");
+        };
+
+        myAgent.OnNewImage += (image) =>
+        {
+            Console.WriteLine($"New image received: {image}");
+        };
+        while (true)
+        {
+            // Prompt the user for input
+            Console.WriteLine("Please enter your prompt for the Azure AI Agent (type 'exit' to quit):");
+            string myPrompt = Console.ReadLine();
+
+            // Check if the user wants to exit
+            if (string.Equals(myPrompt, "exit", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine("Exiting Azure AI Agent interaction.");
+                break;
+            }
+
+            // Validate the input
+            if (string.IsNullOrWhiteSpace(myPrompt))
+            {
+                Console.WriteLine("Prompt cannot be null or empty. Please try again.");
+                continue;
+            }
+
+            // Send the user's prompt to the Azure AI Agent
+            await myAgent.SendMessageAsync(myPrompt);
+            Console.WriteLine(); // Add a blank line for better readability
+        }
+        myAgent.CleanResources();
+        
+    }
+    static async Task CallGenieAPI()
     {
         // Load configuration from appsettings.json
         var configuration = new ConfigurationBuilder()
